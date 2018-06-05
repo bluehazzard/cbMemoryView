@@ -1,0 +1,15 @@
+.objs*
+debug
+release
+*.gch
+*.layout
+*.depend
+*.patch
+*.a
+*.exe
+*.dll
+*.bmarks
+*build_log.html
+*.cbTemp
+*.cbplugin
+*.zip

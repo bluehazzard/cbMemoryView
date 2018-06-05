@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<resource_extra>
+		<object root="1" />
+		<object name="ID_STATICTEXT1" class="wxStaticText" variable="StaticText1" member="yes" />
+		<object name="ID_TEXTCTRL1" class="wxTextCtrl" variable="m_Address" member="yes">
+			<handler function="OnTextEnter" entry="EVT_TEXT_ENTER" />
+		</object>
+		<object name="ID_STATICTEXT2" class="wxStaticText" variable="StaticText2" member="yes" />
+		<object name="ID_TEXTCTRL2" class="wxTextCtrl" variable="m_Size" member="yes">
+			<handler function="OnTextEnter" entry="EVT_TEXT_ENTER" />
+		</object>
+		<object name="ID_TEXTCTRL3" class="wxTextCtrl" variable="m_ByteOutput" member="yes" />
+		<object name="ID_TEXTCTRL4" class="wxTextCtrl" variable="m_AchiiOutput" member="yes" />
+	</resource_extra>
+</wxsmith>
