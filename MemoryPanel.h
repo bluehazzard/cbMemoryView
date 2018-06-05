@@ -3,6 +3,7 @@
 
 //(*Headers(MemoryPanel)
 #include <wx/panel.h>
+#include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 //*)
@@ -39,6 +40,7 @@ class MemoryPanel: public wxPanel
 		void OnTextEnter(wxCommandEvent& event);
 		//*)
 
+		uint64_t                 m_addr;
 		std::shared_ptr<cbWatch> m_watch;
 
 		DECLARE_EVENT_TABLE()

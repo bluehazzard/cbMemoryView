@@ -28,8 +28,8 @@ MemoryPanel::MemoryPanel(wxWindow* parent)
 	Connect(XRCID("ID_TEXTCTRL2"),wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&MemoryPanel::OnTextEnter);
 	//*)
 
-	m_ByteOutput->SetFont( wxFont(12, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL) );
-	m_AchiiOutput->SetFont( wxFont(12, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL) );
+	m_ByteOutput->SetFont( wxFont(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL) );
+	m_AchiiOutput->SetFont( wxFont(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL) );
 }
 
 MemoryPanel::~MemoryPanel()
@@ -60,7 +60,9 @@ void MemoryPanel::OnTextEnter(wxCommandEvent& event)
             m_ByteOutput->SetValue("Size or Address are invalid...");
         }
 
-        m_watch = dbg->AddMemoryRange( addr , size, wxEmptyString );
+        m_addr = addr;
+
+        m_watch = dbg->AddMemoryRange( m_addr , size, wxEmptyString );
     }
 }
 
@@ -68,26 +70,50 @@ void MemoryPanel::UpdatePanel()
 {
     wxString memory;
     wxString ascii;
-    uint8_t dot[] = {0xC2, 0xB7, 0};
 
     wxString val;
+
+    if(!m_watch)
+        return; // WTF is going on?
+
     m_watch->GetValue(val);
 
     wxCharBuffer buff = val.To8BitData();
+    memory << wxT("           ");
+    ascii  << wxT("           ");
+
+    for(size_t i = 0; i < 32; ++i)
+    {
+        memory << wxString::Format(wxT("%02x "),(unsigned int)(0xFF&i));
+        ascii  << wxString::Format(wxT("%02x "),(unsigned int)(0xFF&i));
+    }
+
+    memory << wxT("\n");
+    memory << wxString::Format(wxT("0x%08lx "),(m_addr));
+    ascii << wxT("\n");
+    ascii  << wxString::Format(wxT("0x%08lx "),(m_addr));
+
+    int line = 1;
 
     for(size_t i = 0; i < val.size(); ++i)
     {
-        memory << wxString::Format(wxT("%2x "), buff[i]);
-        if(buff[i] < 128)
-            ascii << wxString::Format(wxT("%c "), buff[i]);
+        char tmp = buff[i];
+        memory << wxString::Format(wxT("%02x "),(unsigned int)(0xFF&tmp));
+        if(buff[i] > 31 && buff[i] < 126 && buff[i] != '\n')
+            ascii << wxString::Format(wxT("%2c "), buff[i]);
+        else if (buff[i] == '\n')
+            ascii << wxT("\\n ");
         else
-            ascii << wxString::FromUTF8((char*) dot);
+            ascii << wxString::FromUTF8(u8"·· ");
 
 
-        if(i % 32 == 0)
+        if((i+1) % 32 == 0)
         {
             memory << wxT("\n");
             ascii  << wxT("\n");
+            memory << wxString::Format(wxT("0x%08lx "),(m_addr + line * 32));
+            ascii  << wxString::Format(wxT("0x%08lx "),(m_addr + line * 32));
+            line++;
         }
     }
 

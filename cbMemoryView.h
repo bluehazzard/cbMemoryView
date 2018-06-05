@@ -22,7 +22,7 @@
 #include <cbplugin.h> // for "class cbPlugin"
 #include "debuggermanager.h"
 #include "cbdebugger_interfaces.h"
-#include "cbmvwindow.h"
+#include <deque>
 
 class MemoryViewMenuItem : public cbDebuggerWindowMenuItem
 {
