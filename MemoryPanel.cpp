@@ -36,6 +36,8 @@ MemoryPanel::MemoryPanel(wxWindow* parent)
 	m_AchiiOutput->SetFont( wxFont(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL) );
 
 	ScrollBar1->SetRange(0);
+	wxSize windowSize = SplitterWindow1->GetSize();
+	SplitterWindow1->SetSashPosition(0.65*windowSize.GetWidth());
 }
 
 MemoryPanel::~MemoryPanel()

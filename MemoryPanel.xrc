@@ -7,51 +7,41 @@
 			<growablecols>0</growablecols>
 			<growablerows>1</growablerows>
 			<object class="sizeritem">
-				<object class="wxBoxSizer">
+				<object class="wxFlexGridSizer">
+					<cols>4</cols>
+					<growablecols>1</growablecols>
 					<object class="sizeritem">
-						<object class="wxBoxSizer">
-							<object class="sizeritem">
-								<object class="wxStaticText" name="ID_STATICTEXT1">
-									<label>Address:</label>
-								</object>
-								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-								<border>5</border>
-								<option>1</option>
-							</object>
-							<object class="sizeritem">
-								<object class="wxTextCtrl" name="ID_TEXTCTRL1">
-									<value>0x0</value>
-									<style>wxTE_PROCESS_ENTER</style>
-								</object>
-								<flag>wxALL|wxEXPAND</flag>
-								<border>5</border>
-								<option>3</option>
-							</object>
+						<object class="wxStaticText" name="ID_STATICTEXT1">
+							<label>Address:</label>
 						</object>
-						<flag>wxALL|wxEXPAND</flag>
-						<option>2</option>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
 					</object>
 					<object class="sizeritem">
-						<object class="wxBoxSizer">
-							<object class="sizeritem">
-								<object class="wxStaticText" name="ID_STATICTEXT2">
-									<label>Size:</label>
-								</object>
-								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-								<border>5</border>
-								<option>1</option>
-							</object>
-							<object class="sizeritem">
-								<object class="wxTextCtrl" name="ID_TEXTCTRL2">
-									<value>32</value>
-									<style>wxTE_PROCESS_ENTER</style>
-								</object>
-								<flag>wxALL|wxEXPAND</flag>
-								<border>5</border>
-								<option>5</option>
-							</object>
+						<object class="wxTextCtrl" name="ID_TEXTCTRL1">
+							<value>0x0</value>
+							<style>wxTE_PROCESS_ENTER</style>
 						</object>
 						<flag>wxALL|wxEXPAND</flag>
+						<border>5</border>
+						<option>3</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxStaticText" name="ID_STATICTEXT2">
+							<label>Size:</label>
+						</object>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxTextCtrl" name="ID_TEXTCTRL2">
+							<value>32</value>
+							<style>wxTE_PROCESS_ENTER</style>
+						</object>
+						<flag>wxALL|wxEXPAND</flag>
+						<border>5</border>
 						<option>1</option>
 					</object>
 				</object>
@@ -95,7 +85,6 @@
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND</flag>
-				<border>5</border>
 				<option>1</option>
 			</object>
 		</object>
