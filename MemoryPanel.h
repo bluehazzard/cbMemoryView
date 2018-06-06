@@ -3,7 +3,8 @@
 
 //(*Headers(MemoryPanel)
 #include <wx/panel.h>
-#include <wx/sizer.h>
+#include <wx/scrolbar.h>
+#include <wx/splitter.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 //*)
@@ -19,6 +20,8 @@ class MemoryPanel: public wxPanel
 		virtual ~MemoryPanel();
 
 		//(*Declarations(MemoryPanel)
+		wxScrollBar* ScrollBar1;
+		wxSplitterWindow* SplitterWindow1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText2;
 		wxTextCtrl* m_AchiiOutput;
@@ -28,6 +31,7 @@ class MemoryPanel: public wxPanel
 		//*)
 
 		void UpdatePanel();
+		void OnScroll(wxScrollEvent& event);
 
 	protected:
 

@@ -11,6 +11,8 @@
 BEGIN_EVENT_TABLE(MemoryPanel,wxPanel)
 	//(*EventTable(MemoryPanel)
 	//*)
+	//EVT_COMMAND_SCROLL(XRCID("ID_TEXTBYTE"), MemoryPanel::OnScroll)
+	EVT_COMMAND_SCROLL(XRCID("ID_SCROLLBAR1"), MemoryPanel::OnScroll)
 END_EVENT_TABLE()
 
 MemoryPanel::MemoryPanel(wxWindow* parent)
@@ -21,8 +23,10 @@ MemoryPanel::MemoryPanel(wxWindow* parent)
 	m_Address = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL1"));
 	StaticText2 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT2"));
 	m_Size = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL2"));
-	m_ByteOutput = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL3"));
-	m_AchiiOutput = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL4"));
+	m_ByteOutput = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTBYTE"));
+	m_AchiiOutput = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTASCII"));
+	SplitterWindow1 = (wxSplitterWindow*)FindWindow(XRCID("ID_SPLITTERWINDOW1"));
+	ScrollBar1 = (wxScrollBar*)FindWindow(XRCID("ID_SCROLLBAR1"));
 
 	Connect(XRCID("ID_TEXTCTRL1"),wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&MemoryPanel::OnTextEnter);
 	Connect(XRCID("ID_TEXTCTRL2"),wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&MemoryPanel::OnTextEnter);
@@ -30,6 +34,8 @@ MemoryPanel::MemoryPanel(wxWindow* parent)
 
 	m_ByteOutput->SetFont( wxFont(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL) );
 	m_AchiiOutput->SetFont( wxFont(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL) );
+
+	ScrollBar1->SetRange(0);
 }
 
 MemoryPanel::~MemoryPanel()
@@ -64,6 +70,12 @@ void MemoryPanel::OnTextEnter(wxCommandEvent& event)
 
         m_watch = dbg->AddMemoryRange( m_addr , size, wxEmptyString );
     }
+}
+
+void MemoryPanel::OnScroll(wxScrollEvent& event)
+{
+    m_ByteOutput->ShowPosition(m_AchiiOutput->XYToPosition(0, event.GetPosition()));
+    m_AchiiOutput->ShowPosition(m_AchiiOutput->XYToPosition(0, event.GetPosition()));
 }
 
 void MemoryPanel::UpdatePanel()
@@ -119,4 +131,6 @@ void MemoryPanel::UpdatePanel()
 
     m_ByteOutput->SetValue(memory);
     m_AchiiOutput->SetValue(ascii);
+
+    ScrollBar1->SetRange(line);
 }

@@ -10,7 +10,8 @@
 		<object name="ID_TEXTCTRL2" class="wxTextCtrl" variable="m_Size" member="yes">
 			<handler function="OnTextEnter" entry="EVT_TEXT_ENTER" />
 		</object>
-		<object name="ID_TEXTCTRL3" class="wxTextCtrl" variable="m_ByteOutput" member="yes" />
-		<object name="ID_TEXTCTRL4" class="wxTextCtrl" variable="m_AchiiOutput" member="yes" />
+		<object name="ID_TEXTBYTE" class="wxTextCtrl" variable="m_ByteOutput" member="yes" />
+		<object name="ID_TEXTASCII" class="wxTextCtrl" variable="m_AchiiOutput" member="yes" />
+		<object name="ID_SCROLLBAR1" class="wxScrollBar" variable="ScrollBar1" member="yes" />
 	</resource_extra>
 </wxsmith>

@@ -59,20 +59,35 @@
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
-				<object class="wxBoxSizer">
+				<object class="wxFlexGridSizer">
+					<cols>2</cols>
+					<rows>1</rows>
+					<growablecols>0</growablecols>
+					<growablerows>0</growablerows>
 					<object class="sizeritem">
-						<object class="wxTextCtrl" name="ID_TEXTCTRL3">
-							<value>Text</value>
-							<style>wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP|wxHSCROLL</style>
+						<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1">
+							<sashpos>200</sashpos>
+							<minpanesize>10</minpanesize>
+							<orientation>vertical</orientation>
+							<object class="wxTextCtrl" name="ID_TEXTBYTE">
+								<pos>54,26</pos>
+								<style>wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP|wxHSCROLL</style>
+							</object>
+							<object class="wxTextCtrl" name="ID_TEXTASCII">
+								<pos>116,-9</pos>
+								<style>wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP|wxHSCROLL</style>
+							</object>
 						</object>
 						<flag>wxALL|wxEXPAND</flag>
 						<border>5</border>
-						<option>2</option>
+						<option>10</option>
 					</object>
 					<object class="sizeritem">
-						<object class="wxTextCtrl" name="ID_TEXTCTRL4">
-							<value>Text</value>
-							<style>wxTE_MULTILINE|wxTE_READONLY|wxTE_DONTWRAP|wxHSCROLL</style>
+						<object class="wxScrollBar" name="ID_SCROLLBAR1">
+							<thumbsize>1</thumbsize>
+							<range>10</range>
+							<pagesize>1</pagesize>
+							<size>20,0</size>
 						</object>
 						<flag>wxALL|wxEXPAND</flag>
 						<border>5</border>
@@ -80,6 +95,7 @@
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND</flag>
+				<border>5</border>
 				<option>1</option>
 			</object>
 		</object>
