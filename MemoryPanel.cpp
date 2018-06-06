@@ -89,9 +89,9 @@ void MemoryPanel::UpdatePanel()
     }
 
     memory << wxT("\n");
-    memory << wxString::Format(wxT("0x%08lx "),(m_addr));
+    memory << wxString::Format(wxT("0x%08llx "),(m_addr));
     ascii << wxT("\n");
-    ascii  << wxString::Format(wxT("0x%08lx "),(m_addr));
+    ascii  << wxString::Format(wxT("0x%08llx "),(m_addr));
 
     int line = 1;
 
@@ -111,8 +111,8 @@ void MemoryPanel::UpdatePanel()
         {
             memory << wxT("\n");
             ascii  << wxT("\n");
-            memory << wxString::Format(wxT("0x%08lx "),(m_addr + line * 32));
-            ascii  << wxString::Format(wxT("0x%08lx "),(m_addr + line * 32));
+            memory << wxString::Format(wxT("0x%08llx "),(m_addr + line * 32));
+            ascii  << wxString::Format(wxT("0x%08llx "),(m_addr + line * 32));
             line++;
         }
     }
