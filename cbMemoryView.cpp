@@ -1,7 +1,14 @@
 #include <sdk.h> // Code::Blocks SDK
+#include <cbdebugger_interfaces.h>
+#include <macrosmanager.h>
 #include <configurationpanel.h>
+#include <debuggermanager.h>
+#include <logmanager.h>
+#include <projectloader_hooks.h>
+
 #include "cbMemoryView.h"
-#include "logmanager.h"
+
+typedef cbEventFunctor<cbMemoryView, CodeBlocksEvent> Functor;
 
 // Register the plugin with Code::Blocks.
 // We are using an anonymous namespace so we don't litter the global one.
@@ -101,7 +108,7 @@ void cbMemoryView::OnAttach()
     Manager::Get()->GetDebuggerManager()->GetMenuHandler()->RegisterWindowMenu(wxT("Memory view"), wxT("Memory view"), m_MenuItem);
 
 
-    Manager::Get()->RegisterEventSink(cbEVT_DEBUGGER_UPDATE_UI,  new cbEventFunctor<cbMemoryView, CodeBlocksDebuggerEvent>(this, &cbMemoryView::OnDebuggerWinEvt));
+    Manager::Get()->RegisterEventSink(cbEVT_DEBUGGER_UPDATED,  new Functor(this, &cbMemoryView::OnDebuggerWinEvt));
 
     m_window->AddPage(new MemoryPanel(m_window), wxT("Memory View") , false);
     m_window->AddPage(new MemoryPanel(m_window), wxT("Memory View2") , false);
@@ -150,24 +157,23 @@ bool cbMemoryView::BuildToolBar(wxToolBar* toolBar)
 }
 
 
-void cbMemoryView::OnDebuggerStateEvt(CodeBlocksDebuggerEvent& evt)
+void cbMemoryView::OnDebuggerStateEvt(CodeBlocksEvent& evt)
 {
 
 }
 
-void cbMemoryView::OnDebuggerWinEvt(CodeBlocksDebuggerEvent& evt)
+void cbMemoryView::OnDebuggerWinEvt(CodeBlocksEvent& evt)
 {
-    cbDebuggerWindow win = evt.GetWindow();
+    if (cbDebuggerPlugin::DebugWindows(evt.GetInt()) != cbDebuggerPlugin::DebugWindows::MemoryRange)
+        return;
+
     Manager::Get()->GetLogManager()->Log(wxT("::OnDebuggerWinEvt"));
-    if(win == DEBUGGER_WINDOW_MEMORY)
+    for(size_t i = 0; i < m_window->GetPageCount(); ++i)
     {
-        for(size_t i = 0; i < m_window->GetPageCount(); ++i)
+        MemoryPanel* panel = dynamic_cast<MemoryPanel*>(m_window->GetPage(i));
+        if(panel)
         {
-            MemoryPanel* panel = dynamic_cast<MemoryPanel*>(m_window->GetPage(i));
-            if(panel)
-            {
-                panel->UpdatePanel();
-            }
+            panel->UpdatePanel();
         }
     }
 }

@@ -70,7 +70,7 @@ void MemoryPanel::OnTextEnter(wxCommandEvent& event)
 
         m_addr = addr;
 
-        m_watch = dbg->AddMemoryRange( m_addr , size, wxEmptyString );
+        m_watch = dbg->AddMemoryRange( m_addr , size, wxEmptyString, true );
     }
 }
 
