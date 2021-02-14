@@ -71,6 +71,7 @@ void MemoryPanel::OnTextEnter(wxCommandEvent& event)
         m_addr = addr;
 
         m_watch = dbg->AddMemoryRange( m_addr , size, wxEmptyString, true );
+        dbg->UpdateWatch(m_watch);
     }
 }
 
@@ -78,6 +79,18 @@ void MemoryPanel::OnScroll(wxScrollEvent& event)
 {
     m_ByteOutput->ShowPosition(m_AchiiOutput->XYToPosition(0, event.GetPosition()));
     m_AchiiOutput->ShowPosition(m_AchiiOutput->XYToPosition(0, event.GetPosition()));
+}
+
+void MemoryPanel::DebuggerCursorChanged()
+{
+    if(!m_watch)
+        return;
+
+    cbDebuggerPlugin *dbg = Manager::Get()->GetDebuggerManager()->GetActiveDebugger();
+    if(dbg->IsRunning())
+    {
+        dbg->UpdateWatch(m_watch);
+    }
 }
 
 void MemoryPanel::UpdatePanel()

@@ -32,6 +32,7 @@ class MemoryPanel: public wxPanel
 
 		void UpdatePanel();
 		void OnScroll(wxScrollEvent& event);
+		void DebuggerCursorChanged();
 
 	protected:
 

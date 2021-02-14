@@ -91,8 +91,8 @@ void cbMemoryView::OnAttach()
                                  wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_WINDOWLIST_BUTTON | wxAUI_NB_CLOSE_ON_ALL_TABS);
 
     CodeBlocksDockEvent evt(cbEVT_ADD_DOCK_WINDOW);
-    evt.name = _T("SystemView");
-    evt.title = _("System View Register window");
+    evt.name = _T("MemoryView");
+    evt.title = _("Memory view window");
     evt.pWindow = m_window;
     evt.dockSide = CodeBlocksDockEvent::dsFloating;
     evt.desiredSize.Set(400, 300);
@@ -109,6 +109,7 @@ void cbMemoryView::OnAttach()
 
 
     Manager::Get()->RegisterEventSink(cbEVT_DEBUGGER_UPDATED,  new Functor(this, &cbMemoryView::OnDebuggerWinEvt));
+    Manager::Get()->RegisterEventSink(cbEVT_DEBUGGER_CURSOR_CHANGED,  new Functor(this, &cbMemoryView::OnDebuggerCursorChanged));
 
     m_window->AddPage(new MemoryPanel(m_window), wxT("Memory View") , false);
     m_window->AddPage(new MemoryPanel(m_window), wxT("Memory View2") , false);
@@ -156,10 +157,17 @@ bool cbMemoryView::BuildToolBar(wxToolBar* toolBar)
     return false;
 }
 
-
-void cbMemoryView::OnDebuggerStateEvt(CodeBlocksEvent& evt)
+void cbMemoryView::OnDebuggerCursorChanged(CodeBlocksEvent& evt)
 {
-
+    Manager::Get()->GetLogManager()->Log(wxT("::OnDebuggerCursorChanged"));
+    for(size_t i = 0; i < m_window->GetPageCount(); ++i)
+    {
+        MemoryPanel* panel = dynamic_cast<MemoryPanel*>(m_window->GetPage(i));
+        if(panel)
+        {
+            panel->DebuggerCursorChanged();
+        }
+    }
 }
 
 void cbMemoryView::OnDebuggerWinEvt(CodeBlocksEvent& evt)

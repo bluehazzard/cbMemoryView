@@ -122,8 +122,8 @@ class cbMemoryView : public cbPlugin
         virtual void OnAddPage(wxCommandEvent& event);
         virtual void OnRenamePage(wxCommandEvent& event);
 
-        void OnDebuggerStateEvt(CodeBlocksEvent& evt);
         void OnDebuggerWinEvt(CodeBlocksEvent& evt);
+        void OnDebuggerCursorChanged(CodeBlocksEvent& evt);
 
     private:
         typedef std::deque<MemoryPanel*> PanelList;
