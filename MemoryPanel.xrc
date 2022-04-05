@@ -11,7 +11,7 @@
 					<cols>4</cols>
 					<growablecols>1</growablecols>
 					<object class="sizeritem">
-						<object class="wxStaticText" name="ID_STATICTEXT1">
+						<object class="wxStaticText" name="ID_STATICTEXT_ADDRESS">
 							<label>Address:</label>
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -19,7 +19,7 @@
 						<option>1</option>
 					</object>
 					<object class="sizeritem">
-						<object class="wxTextCtrl" name="ID_TEXTCTRL1">
+						<object class="wxTextCtrl" name="ID_TEXTCTRL_ADDRESS">
 							<value>0x0</value>
 							<style>wxTE_PROCESS_ENTER</style>
 						</object>
@@ -28,7 +28,7 @@
 						<option>3</option>
 					</object>
 					<object class="sizeritem">
-						<object class="wxStaticText" name="ID_STATICTEXT2">
+						<object class="wxStaticText" name="ID_STATICTEXT_SIZE">
 							<label>Size:</label>
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -36,7 +36,7 @@
 						<option>1</option>
 					</object>
 					<object class="sizeritem">
-						<object class="wxTextCtrl" name="ID_TEXTCTRL2">
+						<object class="wxTextCtrl" name="ID_TEXTCTRL_SIZE">
 							<value>32</value>
 							<style>wxTE_PROCESS_ENTER</style>
 						</object>
