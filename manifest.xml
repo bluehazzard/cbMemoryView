@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_plugin_manifest_file>
-    <SdkVersion major="1" minor="36"  release="0" />
+    <SdkVersion major="2" minor="17"  release="0" />
     <Plugin name="cbMemoryView">
         <Value title="cbMemoryView" />
-        <Value version="0.1" />
+        <Value version="0.2.0" />
         <Value description="" />
         <Value author="Bluehazzard" />
         <Value authorEmail="bluehazzard2@gmail.com" />
-        <Value authorWebsite="" />
+        <Value authorWebsite="https://github.com/bluehazzard/cbMemoryView" />
         <Value thanksTo="" />
         <Value license="GPL" />
     </Plugin>

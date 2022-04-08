@@ -65,10 +65,17 @@ void MemoryPanel::OnTextEnter(wxCommandEvent& event)
         else
         {
             wxString sSize = m_Size->GetValue();
-            uint64_t llSize;
-            if (sSize.ToULongLong(&llSize, 10))
+            if (sSize.ToULongLong(&m_llSize, 10))
             {
-                m_watch = dbg->AddMemoryRange(m_sAddress, llSize, true);
+                uint64_t llAddress;
+                if (m_sAddress.ToULongLong(&llAddress, 16))
+                {
+                    m_watch = dbg->AddMemoryRange(llAddress, m_llSize, wxEmptyString, true);
+                }
+                else
+                {
+                    m_watch = dbg->AddMemoryRange( 0, m_llSize, m_sAddress, true);
+                }
                 dbg->UpdateWatch(m_watch);
             }
             else
@@ -99,13 +106,17 @@ void MemoryPanel::DebuggerCursorChanged()
 
 void MemoryPanel::UpdatePanel()
 {
+    if(!m_watch)
+    {
+        m_ByteOutput->SetValue(_("Cannot find m_watch!"));
+        m_AchiiOutput->SetValue(_("Cannot find m_watch!"));
+        ScrollBar1->SetRange(1);
+        return; // WTF is going on?
+    }
 
     wxString val;
-
-    if(!m_watch)
-        return; // WTF is going on?
-
     m_watch->GetValue(val);
+
     if (m_watch->GetIsValueErrorMessage())
     {
         m_ByteOutput->SetValue(val);
@@ -114,14 +125,43 @@ void MemoryPanel::UpdatePanel()
         return;
     }
 
+    if(val.IsEmpty())
+    {
+        m_ByteOutput->SetValue(_("No result data found!"));
+        m_AchiiOutput->SetValue(_("No result data found!"));
+        ScrollBar1->SetRange(1);
+        return; // WTF is going on?
+    }
+
+    // ----------------------------------------------------------------------------------------
+    //
+    // (gdb) x/40xb 0x172e750
+    // 0x172e750:      0xff    0xff    0x00    0x00    0x00    0x00    0x00    0x00
+    // 0x172e758:      0x00    0x00    0x00    0x00    0x00    0x00    0x00    0x00
+    // 0x172e760:      0x00    0x00    0x00    0x00    0x00    0x00    0x00    0x00
+    // 0x172e768:      0xc0    0xe0    0x5b    0x01    0x00    0x00    0x00    0x00
+    // 0x172e770:      0xd8    0x00    0x00    0x00    0x29    0x00    0x00    0x00
+    //
+    // ----------------------------------------------------------------------------------------
+    //
+    // GDB/MI  "-data-read-memory-bytes %s %d", m_address, m_length);
+    //      memory=
+    //      [
+    //          {
+    //              begin="0x0000008284fffc40",
+    //              offset="0x0000000000000000",
+    //              end="0x0000008284fffc60",
+    //              contents="000000000154657374204f6e650000000000000000000000000100b501000000"
+    //          }
+    //      ]
+    //
+    // ----------------------------------------------------------------------------------------
+
     wxString memory = wxEmptyString;
     wxString ascii = wxEmptyString;
 
-    uint64_t llAddress;
-    wxString sAddress = m_watch->GetAddress();
-    sAddress.ToULongLong(&llAddress, 16);
-
-
+    uint64_t llAddress = m_watch->GetAddress();
+    int line = 1;
 #if wxCHECK_VERSION(3, 1, 5)
     if (wxPlatformInfo::Get().GetBitness() == wxBITNESS_64)
 #else
@@ -138,18 +178,29 @@ void MemoryPanel::UpdatePanel()
         ascii  << wxString::Format("%#10llx ", llAddress); // 10 = 0x + 8 digits
     }
 
+    bool bGDBOldMemoryRead = val.Contains("0x");
+    wxCharBuffer buff = val.To8BitData();
     wxString hBuff;
     long lBuff;
-    int line = 1;
+
     for(size_t i = 0; i < val.size(); ++i)
     {
-        hBuff = val.Mid(i*2,2);
-        if (!hBuff.ToLong(&lBuff, 16))
+        if (bGDBOldMemoryRead)
         {
-            lBuff = 0;
+            lBuff = buff[i];
+            memory << wxString::Format("%02x ",(unsigned int)(0xFF&lBuff));
         }
-        memory << hBuff << ' ';
-        if(lBuff > 31 && lBuff < 126 && lBuff != '\n')
+        else
+        {
+            hBuff = val.Mid(i*2,2);
+            if (!hBuff.ToLong(&lBuff, 16))
+            {
+                lBuff = 0;
+            }
+            memory << hBuff << ' ';
+        }
+
+        if ((lBuff > 31) && (lBuff < 126) && (lBuff != '\n'))
         {
             ascii << wxString::Format("%2c ", lBuff);
         }
@@ -159,10 +210,10 @@ void MemoryPanel::UpdatePanel()
         }
         else
         {
-            ascii << wxString::FromUTF8(u8"·· ");
+            ascii << wxString::Format("·· ");
         }
 
-        if ((i+1) % 32 == 0)
+        if((i+1) % 32 == 0)
         {
             uint64_t m_llAddressDisplay = llAddress + line * 32;
 #if wxCHECK_VERSION(3, 1, 5)
