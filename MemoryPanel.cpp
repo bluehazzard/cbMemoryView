@@ -178,14 +178,14 @@ void MemoryPanel::UpdatePanel()
         ascii  << wxString::Format("%#10llx ", llAddress); // 10 = 0x + 8 digits
     }
 
-    bool bGDBOldMemoryRead = val.Contains("0x");
     wxCharBuffer buff = val.To8BitData();
     wxString hBuff;
     long lBuff;
+    size_t valSize = val.size();
 
-    for(size_t i = 0; i < val.size(); ++i)
+    for(size_t i = 0; i < valSize; ++i)
     {
-        if (bGDBOldMemoryRead)
+        if (valSize == m_llSize)
         {
             lBuff = buff[i];
             memory << wxString::Format("%02x ",(unsigned int)(0xFF&lBuff));
@@ -213,7 +213,7 @@ void MemoryPanel::UpdatePanel()
             ascii << wxString::Format("·· ");
         }
 
-        if((i+1) % 32 == 0)
+        if (((i+1) % 32 == 0) && (i < valSize-1))
         {
             uint64_t m_llAddressDisplay = llAddress + line * 32;
 #if wxCHECK_VERSION(3, 1, 5)
