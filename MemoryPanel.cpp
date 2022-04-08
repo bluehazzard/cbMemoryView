@@ -19,17 +19,17 @@ MemoryPanel::MemoryPanel(wxWindow* parent)
 {
 	//(*Initialize(MemoryPanel)
 	wxXmlResource::Get()->LoadObject(this,parent,_T("MemoryPanel"),_T("wxPanel"));
-	StaticText1 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT1"));
-	m_Address = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL1"));
-	StaticText2 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT2"));
-	m_Size = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL2"));
+	StaticText1 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT_ADDRESS"));
+	m_Address = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL_ADDRESS"));
+	StaticText2 = (wxStaticText*)FindWindow(XRCID("ID_STATICTEXT_SIZE"));
+	m_Size = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTCTRL_SIZE"));
 	m_ByteOutput = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTBYTE"));
 	m_AchiiOutput = (wxTextCtrl*)FindWindow(XRCID("ID_TEXTASCII"));
 	SplitterWindow1 = (wxSplitterWindow*)FindWindow(XRCID("ID_SPLITTERWINDOW1"));
 	ScrollBar1 = (wxScrollBar*)FindWindow(XRCID("ID_SCROLLBAR1"));
 
-	Connect(XRCID("ID_TEXTCTRL1"),wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&MemoryPanel::OnTextEnter);
-	Connect(XRCID("ID_TEXTCTRL2"),wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&MemoryPanel::OnTextEnter);
+	Connect(XRCID("ID_TEXTCTRL_ADDRESS"),wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&MemoryPanel::OnTextEnter);
+	Connect(XRCID("ID_TEXTCTRL_SIZE"),wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&MemoryPanel::OnTextEnter);
 	//*)
 
 	m_ByteOutput->SetFont( wxFont(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL) );
@@ -57,21 +57,32 @@ void MemoryPanel::OnTextEnter(wxCommandEvent& event)
             dbg->DeleteWatch(m_watch);
         }
 
-        uint64_t addr = 0;
-        uint64_t size = 0;
-        try
+        m_sAddress = m_Address->GetValue();
+        if (m_sAddress.IsEmpty())
         {
-            addr = std::stoull(std::string(m_Address->GetValue().ToUTF8()), 0, 0);
-            size = std::stoull(std::string(m_Size->GetValue().ToUTF8()), 0, 0);
-        } catch (...)
-        {
-            m_ByteOutput->SetValue("Size or Address are invalid...");
+            m_ByteOutput->SetValue("Address is invalid...");
         }
-
-        m_addr = addr;
-
-        m_watch = dbg->AddMemoryRange( m_addr , size, wxEmptyString, true );
-        dbg->UpdateWatch(m_watch);
+        else
+        {
+            wxString sSize = m_Size->GetValue();
+            if (sSize.ToULongLong(&m_llSize, 10))
+            {
+                uint64_t llAddress;
+                if (m_sAddress.ToULongLong(&llAddress, 16))
+                {
+                    m_watch = dbg->AddMemoryRange(llAddress, m_llSize, wxEmptyString, true);
+                }
+                else
+                {
+                    m_watch = dbg->AddMemoryRange( 0, m_llSize, m_sAddress, true);
+                }
+                dbg->UpdateWatch(m_watch);
+            }
+            else
+            {
+                m_ByteOutput->SetValue("Size is invalid...");
+            }
+        }
     }
 }
 
@@ -95,51 +106,131 @@ void MemoryPanel::DebuggerCursorChanged()
 
 void MemoryPanel::UpdatePanel()
 {
-    wxString memory;
-    wxString ascii;
-
-    wxString val;
-
     if(!m_watch)
-        return; // WTF is going on?
-
-    m_watch->GetValue(val);
-
-    wxCharBuffer buff = val.To8BitData();
-    memory << wxT("           ");
-    ascii  << wxT("           ");
-
-    for(size_t i = 0; i < 32; ++i)
     {
-        memory << wxString::Format(wxT("%02x "),(unsigned int)(0xFF&i));
-        ascii  << wxString::Format(wxT("%02x "),(unsigned int)(0xFF&i));
+        m_ByteOutput->SetValue(_("Cannot find m_watch!"));
+        m_AchiiOutput->SetValue(_("Cannot find m_watch!"));
+        ScrollBar1->SetRange(1);
+        return; // WTF is going on?
     }
 
-    memory << wxT("\n");
-    memory << wxString::Format(wxT("0x%08llx "),(m_addr));
-    ascii << wxT("\n");
-    ascii  << wxString::Format(wxT("0x%08llx "),(m_addr));
+    wxString val;
+    m_watch->GetValue(val);
 
-    int line = 1;
-
-    for(size_t i = 0; i < val.size(); ++i)
+    if (m_watch->GetIsValueErrorMessage())
     {
-        char tmp = buff[i];
-        memory << wxString::Format(wxT("%02x "),(unsigned int)(0xFF&tmp));
-        if(buff[i] > 31 && buff[i] < 126 && buff[i] != '\n')
-            ascii << wxString::Format(wxT("%2c "), buff[i]);
-        else if (buff[i] == '\n')
-            ascii << wxT("\\n ");
-        else
-            ascii << wxString::FromUTF8(u8"·· ");
+        m_ByteOutput->SetValue(val);
+        m_AchiiOutput->SetValue(val);
+        ScrollBar1->SetRange(1);
+        return;
+    }
 
+    if(val.IsEmpty())
+    {
+        m_ByteOutput->SetValue(_("No result data found!"));
+        m_AchiiOutput->SetValue(_("No result data found!"));
+        ScrollBar1->SetRange(1);
+        return; // WTF is going on?
+    }
 
-        if((i+1) % 32 == 0)
+    // ----------------------------------------------------------------------------------------
+    //
+    // (gdb) x/40xb 0x172e750
+    // 0x172e750:      0xff    0xff    0x00    0x00    0x00    0x00    0x00    0x00
+    // 0x172e758:      0x00    0x00    0x00    0x00    0x00    0x00    0x00    0x00
+    // 0x172e760:      0x00    0x00    0x00    0x00    0x00    0x00    0x00    0x00
+    // 0x172e768:      0xc0    0xe0    0x5b    0x01    0x00    0x00    0x00    0x00
+    // 0x172e770:      0xd8    0x00    0x00    0x00    0x29    0x00    0x00    0x00
+    //
+    // ----------------------------------------------------------------------------------------
+    //
+    // GDB/MI  "-data-read-memory-bytes %s %d", m_address, m_length);
+    //      memory=
+    //      [
+    //          {
+    //              begin="0x0000008284fffc40",
+    //              offset="0x0000000000000000",
+    //              end="0x0000008284fffc60",
+    //              contents="000000000154657374204f6e650000000000000000000000000100b501000000"
+    //          }
+    //      ]
+    //
+    // ----------------------------------------------------------------------------------------
+
+    wxString memory = wxEmptyString;
+    wxString ascii = wxEmptyString;
+
+    uint64_t llAddress = m_watch->GetAddress();
+    int line = 1;
+#if wxCHECK_VERSION(3, 1, 5)
+    if (wxPlatformInfo::Get().GetBitness() == wxBITNESS_64)
+#else
+    if (wxPlatformInfo::Get().GetArchitecture() == wxARCH_64)
+#endif
+    {
+
+        memory << wxString::Format("%#018llx ", llAddress); // 18 = 0x + 16 digits
+        ascii  << wxString::Format("%#018llx ", llAddress); // 18 = 0x + 16 digits
+    }
+    else
+    {
+        memory << wxString::Format("%#10llx ", llAddress); // 10 = 0x + 8 digits
+        ascii  << wxString::Format("%#10llx ", llAddress); // 10 = 0x + 8 digits
+    }
+
+    wxCharBuffer buff = val.To8BitData();
+    wxString hBuff;
+    long lBuff;
+    size_t valSize = val.size();
+
+    for(size_t i = 0; i < valSize; ++i)
+    {
+        if (valSize == m_llSize)
         {
-            memory << wxT("\n");
-            ascii  << wxT("\n");
-            memory << wxString::Format(wxT("0x%08llx "),(m_addr + line * 32));
-            ascii  << wxString::Format(wxT("0x%08llx "),(m_addr + line * 32));
+            lBuff = buff[i];
+            memory << wxString::Format("%02x ",(unsigned int)(0xFF&lBuff));
+        }
+        else
+        {
+            hBuff = val.Mid(i*2,2);
+            if (!hBuff.ToLong(&lBuff, 16))
+            {
+                lBuff = 0;
+            }
+            memory << hBuff << ' ';
+        }
+
+        if ((lBuff > 31) && (lBuff < 126) && (lBuff != '\n'))
+        {
+            ascii << wxString::Format("%2c ", lBuff);
+        }
+        else if (lBuff == '\n')
+        {
+            ascii << "\\n ";
+        }
+        else
+        {
+            ascii << wxString::Format("·· ");
+        }
+
+        if (((i+1) % 32 == 0) && (i < valSize-1))
+        {
+            uint64_t m_llAddressDisplay = llAddress + line * 32;
+#if wxCHECK_VERSION(3, 1, 5)
+            if (wxPlatformInfo::Get().GetBitness() == wxBITNESS_64)
+#else
+            if (wxPlatformInfo::Get().GetArchitecture() == wxARCH_64)
+#endif
+            {
+                memory << wxString::Format("\n%#018llx ", m_llAddressDisplay); // 18 = 0x + 16 digits
+                ascii  << wxString::Format("\n%#018llx ", m_llAddressDisplay); // 18 = 0x + 16 digits
+            }
+            else
+            {
+                memory << wxString::Format("\n%#10llx ", m_llAddressDisplay); // 10 = 0x + 8 digits
+                ascii  << wxString::Format("\n%#10llx ", m_llAddressDisplay); // 10 = 0x + 8 digits
+            }
+
             line++;
         }
     }

@@ -45,7 +45,8 @@ class MemoryPanel: public wxPanel
 		void OnTextEnter(wxCommandEvent& event);
 		//*)
 
-		uint64_t                 m_addr;
+        wxString m_sAddress;
+        uint64_t m_llSize;
 		std::shared_ptr<cbWatch> m_watch;
 
 		DECLARE_EVENT_TABLE()
